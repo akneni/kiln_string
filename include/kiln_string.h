@@ -50,14 +50,12 @@ StringRef StringRef_trim(StringRef string);
 StringRef KilnString_trim(const KilnString* string);
 void KilnString_replace(KilnString* string, const char* old_s, const char* new_s);
 int64_t StringRef_find(StringRef string, const char* target);
+int64_t StringRef_rfind(StringRef string, const char* target);
 extern inline int64_t KilnString_find(const KilnString* string, const char* target);
-StringRef StringRef_partition_left(StringRef string, const char* delimiter);
-StringRef StringRef_partition_right(StringRef string, const char* delimiter);
-StringRef StringRef_rpartition_left(StringRef string, const char* delimiter);
-StringRef StringRef_rpartition_right(StringRef string, const char* delimiter);
-extern inline StringRef KilnString_partition_left(const KilnString* string, const char* delimiter);
-extern inline StringRef KilnString_partition_right(const KilnString* string, const char* delimiter);
-extern inline StringRef KilnString_rpartition_left(const KilnString* string, const char* delimiter);
-extern inline StringRef KilnString_rpartition_right(const KilnString* string, const char* delimiter);
+extern inline int64_t KilnString_rfind(const KilnString* string, const char* target);
+void StringRef_partition(StringRef string, const char* delimiter, StringRef output_buffer[2]);
+void StringRef_rpartition(StringRef string, const char* delimiter, StringRef output_buffer[2]);
+extern inline void KilnString_partition(const KilnString* string, const char* delimiter, StringRef output_buffer[2]);
+extern inline void KilnString_rpartition(const KilnString* string, const char* delimiter, StringRef output_buffer[2]);
 
 #endif // KILN_STRING_H
