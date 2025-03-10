@@ -28,7 +28,7 @@ KilnString KilnString_from_cstr(const char* string) {
 /// @brief Creates a string from a StringRef by compying the contents. 
 /// @param str_ref 
 /// @return 
-__always_inline KilnString KilnString_from_string_ref(StringRef str_ref) {
+inline KilnString KilnString_from_string_ref(StringRef str_ref) {
 	KilnString str = {
 		.__length = str_ref.__length,
 		.__capacity = (str_ref.__length + 1)
@@ -44,41 +44,40 @@ __always_inline KilnString KilnString_from_string_ref(StringRef str_ref) {
 /// @brief Creates a string from a StringRef by compying the contents. 
 /// @param str_ref 
 /// @return 
-__always_inline KilnString StringRef_to_kiln_string(StringRef str_ref) {
+inline KilnString StringRef_to_kiln_string(StringRef str_ref) {
 	return KilnString_from_string_ref(str_ref);
 }
 
-__always_inline StringRef KilnString_as_stringref(const KilnString* string) {
+inline StringRef KilnString_as_stringref(const KilnString* string) {
 	StringRef ref;
 	ref.__length = string->__length;
 	ref.ptr = string->ptr;
 	return ref;
 }
 
-__always_inline StringRef StringRef_from_kiln_str(const KilnString* string) {
+inline StringRef StringRef_from_kiln_str(const KilnString* string) {
 	return KilnString_as_stringref(string);
 }
 
-__always_inline StringRef StringRef_from_cstr(const char* string) {
+inline StringRef StringRef_from_cstr(const char* string) {
 	StringRef ref;
 	ref.__length = strlen(string);
 	ref.ptr = string;
 	return ref;
 }
 
-/// @brief Frees the memory allocated by the kiln string
+/// @brief Frees the memory allocated by the kiln string. Sets the pointer to NULL
 /// @param str 
 /// @return 
-__always_inline void KilnString_free(KilnString* str) {
+inline void KilnString_free(KilnString* str) {
 	free(str->ptr);
 	str->ptr = NULL;
 }
 
-
 /// @brief Appends the content of a char* to a KilnString
 /// @param string 
 /// @param cstr 
-__always_inline void KilnString_push_cstr(KilnString* string, const char* cstr) {
+inline void KilnString_push_cstr(KilnString* string, const char* cstr) {
 	uint64_t length = strlen(cstr);
 	StringRef str_ref = {
 		.__length = length,
@@ -200,7 +199,7 @@ StringRef StringRef_substring(StringRef string, int64_t start_idx, int64_t end_i
 /// @param start_idx -1 to default to the start (or 0)
 /// @param end_idx -1 to default to the end
 /// @return A StringRef pointing to the requested substring
-__always_inline StringRef KilnString_substring(const KilnString* string, int64_t start_idx, int64_t end_idx) {
+inline StringRef KilnString_substring(const KilnString* string, int64_t start_idx, int64_t end_idx) {
     StringRef ref = {string->ptr, string->__length};
     return StringRef_substring(ref, start_idx, end_idx);
 }
@@ -209,7 +208,7 @@ __always_inline StringRef KilnString_substring(const KilnString* string, int64_t
 /// @param string The StringRef to compare
 /// @param other The C-style string to compare against
 /// @return true if the strings are equal, false otherwise
-__always_inline bool StringRef_equals_cstr(StringRef string, const char* other) {
+inline bool StringRef_equals_cstr(StringRef string, const char* other) {
     uint64_t other_len = strlen(other);
     
     if (string.__length != other_len) {
@@ -223,7 +222,7 @@ __always_inline bool StringRef_equals_cstr(StringRef string, const char* other) 
 /// @param s1 The first StringRef to compare
 /// @param s2 The second StringRef to compare
 /// @return true if the strings are equal, false otherwise
-__always_inline bool StringRef_equals(StringRef s1, StringRef s2) {    
+inline bool StringRef_equals(StringRef s1, StringRef s2) {    
     if (s1.__length != s2.__length) {
         return false;
     }
@@ -234,7 +233,7 @@ __always_inline bool StringRef_equals(StringRef s1, StringRef s2) {
 /// @param string The KilnString to compare
 /// @param other The C-style string to compare against
 /// @return true if the strings are equal, false otherwise
-__always_inline bool KilnString_equals_cstr(const KilnString* string, const char* other) {
+inline bool KilnString_equals_cstr(const KilnString* string, const char* other) {
     StringRef ref = {string->ptr, string->__length};
     return StringRef_equals_cstr(ref, other);
 }
@@ -243,7 +242,7 @@ __always_inline bool KilnString_equals_cstr(const KilnString* string, const char
 /// @param s1 The first KilnString to compare
 /// @param s2 The first KilnString to compare
 /// @return true if the strings are equal, false otherwise
-__always_inline bool KilnString_equals(const KilnString* s1, const KilnString* s2) {
+inline bool KilnString_equals(const KilnString* s1, const KilnString* s2) {
 	StringRef ref_1 = {s1->ptr, s1->__length};
 	StringRef ref_2 = {s2->ptr, s2->__length};
 	return StringRef_equals(ref_1, ref_2);
@@ -273,7 +272,7 @@ int32_t StringRef_compare(StringRef s1, StringRef s2) {
 /// @param s1 First KilnString to compare
 /// @param s2 Second KilnString to compare
 /// @return 0 if equal, negative if s1 < s2, positive if s1 > s2
-__always_inline int32_t KilnString_compare(const KilnString* s1, const KilnString* s2) {
+inline int32_t KilnString_compare(const KilnString* s1, const KilnString* s2) {
     StringRef r1 = {s1->ptr, s1->__length};
     StringRef r2 = {s2->ptr, s2->__length};
     return StringRef_compare(r1, r2);
@@ -560,199 +559,125 @@ int64_t StringRef_find(StringRef string, const char* target) {
     return (int64_t)(found - string.ptr);
 }
 
+/// @brief Finds the last occurrence of a target string within a StringRef
+/// @param string The StringRef to search in
+/// @param target The string to search for
+/// @return The position of the last occurrence, or -1 if not found
+int64_t StringRef_rfind(StringRef string, const char* target) {
+    size_t target_len = strlen(target);
+    
+    if (target_len == 0 || target_len > string.__length) {
+        return -1;
+    }
+    
+    for (int64_t i = string.__length - target_len; i >= 0; i--) {
+        bool match = true;
+        
+        for (size_t j = 0; j < target_len; j++) {
+            if (string.ptr[i + j] != target[j]) {
+                match = false;
+                break;
+            }
+        }        
+        if (match) {
+            return i;
+        }
+    }
+    
+    return -1;
+}
+
 /// @brief Returns the index of the first character of the first occurance of `target` in a KilnString. 
 /// @param string The KilnString to search in
 /// @param target The substring to find
 /// @return Returns `-1` if target is not in `string`
-__always_inline int64_t KilnString_find(const KilnString* string, const char* target) {
+inline int64_t KilnString_find(const KilnString* string, const char* target) {
     StringRef ref = {string->ptr, string->__length};
     return StringRef_find(ref, target);
 }
 
-/// @brief Returns everything before the first occurance of `delimiter`
-/// @param string The string to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion before the first delimiter
-StringRef StringRef_partition_left(StringRef string, const char* delimiter) {
-    StringRef result = {string.ptr, 0};
-    
-    if (string.__length == 0 || delimiter == NULL) {
-        return result;
-    }
-    
-    uint64_t delimiter_len = strlen(delimiter);
-    if (delimiter_len == 0) {
-        return result;
-    }
-    
-    char* found = strstr(string.ptr, delimiter);
-    if (found == NULL) {
-        result.__length = string.__length;
-    } else {
-        result.__length = found - string.ptr;
-    }
-    
-    return result;
-}
-
-/// @brief Returns everything after the first occurance of `delimiter`
-/// @param string The string to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion after the first delimiter (NULL if delimiter does not exist)
-StringRef StringRef_partition_right(StringRef string, const char* delimiter) {
-    StringRef result = {NULL, 0};
-    
-    if (string.__length == 0 || delimiter == NULL) {
-        return result;
-    }
-    
-    uint64_t delimiter_len = strlen(delimiter);
-    if (delimiter_len == 0) {
-        result = string;
-        return result;
-    }
-    
-    char* found = strstr(string.ptr, delimiter);
-    if (found == NULL) {
-        return result;
-    } else {
-        result.ptr = found + delimiter_len;
-        
-        uint64_t offset = result.ptr - string.ptr;
-        if (offset < string.__length) {
-            result.__length = string.__length - offset;
-        } else {
-            result.__length = 0;
-        }
-    }
-    
-    return result;
-}
-
-/// @brief Returns everything before the last occurance of `delimiter`
-/// @param string The string to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion before the last delimiter
-StringRef StringRef_rpartition_left(StringRef string, const char* delimiter) {
-    StringRef result = {string.ptr, 0};
-    
-    if (string.__length == 0 || delimiter == NULL) {
-        return result;
-    }
-    
-    uint64_t delimiter_len = strlen(delimiter);
-    if (delimiter_len == 0) {
-        return result;
-    }
-    
-    char* last_found = NULL;
-    char* current_pos = string.ptr;
-    
-    while (1) {
-        char* found = strstr(current_pos, delimiter);
-        if (found == NULL) {
-            break;
-        }
-        
-        last_found = found;
-        current_pos = found + 1;
-        
-        if ((uint64_t)(current_pos - string.ptr) >= string.__length) {
-            break;
-        }
-    }
-    
-    if (last_found == NULL) {
-        result.__length = string.__length;
-    } else {
-        result.__length = last_found - string.ptr;
-    }
-    
-    return result;
-}
-
-/// @brief Returns everything after the last occurance of `delimiter`
-/// @param string The string to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion after the last delimiter (NULL if delimiter does not exist)
-StringRef StringRef_rpartition_right(StringRef string, const char* delimiter) {
-    StringRef result = {NULL, 0};
-    
-    if (string.__length == 0 || delimiter == NULL) {
-        return result;
-    }
-    
-    uint64_t delimiter_len = strlen(delimiter);
-    if (delimiter_len == 0) {
-        result = string;
-        return result;
-    }
-    
-    char* last_found = NULL;
-    char* current_pos = string.ptr;
-    
-    while (1) {
-        char* found = strstr(current_pos, delimiter);
-        if (found == NULL) {
-            break;
-        }
-        
-        last_found = found;
-        current_pos = found + 1;
-        
-        if ((uint64_t)(current_pos - string.ptr) >= string.__length) {
-            break;
-        }
-    }
-    
-    if (last_found == NULL) {
-        return result;
-    } else {
-        result.ptr = last_found + delimiter_len;
-        
-        uint64_t offset = result.ptr - string.ptr;
-        if (offset < string.__length) {
-            result.__length = string.__length - offset;
-        } else {
-            result.__length = 0;
-        }
-    }
-    
-    return result;
-}
-
-/// @brief Returns everything before the first occurrence of `delimiter` in a KilnString
+/// @brief Returns the index of the first character of the last occurance of `target` in a KilnString. 
 /// @param string The KilnString to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion before the first delimiter
-__always_inline StringRef KilnString_partition_left(const KilnString* string, const char* delimiter) {
-	StringRef ref = KilnString_as_stringref(string);
-	return StringRef_partition_left(ref, delimiter);
+/// @param target The substring to find
+/// @return Returns `-1` if target is not in `string`
+inline int64_t KilnString_rfind(const KilnString* string, const char* target) {
+    StringRef ref = {string->ptr, string->__length};
+    return StringRef_rfind(ref, target);
 }
 
-/// @brief Returns everything after the first occurrence of `delimiter` in a KilnString
-/// @param string The KilnString to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion after the first delimiter (NULL if delimiter does not exist)
-__always_inline StringRef KilnString_partition_right(const KilnString* string, const char* delimiter) {
-	StringRef ref = KilnString_as_stringref(string);
-	return StringRef_partition_right(ref, delimiter);
+
+/// @brief Partitions a StringRef into two parts based on the first occurrence of a delimiter
+/// @param string The StringRef to be partitioned
+/// @param delimiter The delimiter string to search for
+/// @param output_buffer Array of 2 StringRefs to store the results - first part before delimiter, second part after delimiter
+void StringRef_partition(StringRef string, const char* delimiter, StringRef output_buffer[2]) {
+    // Find the first occurrence of the delimiter
+    int64_t delimiter_pos = StringRef_find(string, delimiter);
+    
+    if (delimiter_pos == -1) {
+        // Delimiter not found, first part is the entire string, second part is empty
+        output_buffer[0] = string;
+        output_buffer[1] = (StringRef){ .ptr = string.ptr + string.__length, .__length = 0 };
+    } else {
+        // Delimiter found, split the string into two parts
+        // First part: from start to delimiter
+        output_buffer[0] = (StringRef) {
+            .ptr = string.ptr,
+            .__length = delimiter_pos
+        };
+        
+        // Second part: after delimiter to end
+        size_t delimiter_len = strlen(delimiter);
+        output_buffer[1] = (StringRef){
+            .ptr = string.ptr + delimiter_pos + delimiter_len,
+            .__length = string.__length - delimiter_pos - delimiter_len
+        };
+    }
 }
 
-/// @brief Returns everything before the last occurrence of `delimiter` in a KilnString
-/// @param string The KilnString to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion before the last delimiter
-__always_inline StringRef KilnString_rpartition_left(const KilnString* string, const char* delimiter) {
-	StringRef ref = KilnString_as_stringref(string);
-	return StringRef_rpartition_left(ref, delimiter);
+/// @brief Partitions a StringRef into two parts based on the last occurrence of a delimiter
+/// @param string The StringRef to be partitioned
+/// @param delimiter The delimiter string to search for from the end
+/// @param output_buffer Array of 2 StringRefs to store the results - first part before last delimiter, second part after last delimiter
+void StringRef_rpartition(StringRef string, const char* delimiter, StringRef output_buffer[2]) {
+    // Find the last occurrence of the delimiter
+    int64_t delimiter_pos = StringRef_rfind(string, delimiter);
+    
+    if (delimiter_pos == -1) {
+        // Delimiter not found, first part is the entire string, second part is empty
+        output_buffer[0] = string;
+        output_buffer[1] = (StringRef){ .ptr = string.ptr + string.__length, .__length = 0 };
+    } else {
+        // Delimiter found, split the string into two parts
+        // First part: from start to last delimiter
+        output_buffer[0] = (StringRef){
+            .ptr = string.ptr,
+            .__length = delimiter_pos
+        };
+        
+        // Second part: after last delimiter to end
+        size_t delimiter_len = strlen(delimiter);
+        output_buffer[1] = (StringRef){
+            .ptr = string.ptr + delimiter_pos + delimiter_len,
+            .__length = string.__length - delimiter_pos - delimiter_len
+        };
+    }
 }
 
-/// @brief Returns everything after the last occurrence of `delimiter` in a KilnString
-/// @param string The KilnString to search in
-/// @param delimiter The delimiter to search for
-/// @return A StringRef containing the portion after the last delimiter (NULL if delimiter does not exist)
-__always_inline StringRef KilnString_rpartition_right(const KilnString* string, const char* delimiter) {
-	StringRef ref = KilnString_as_stringref(string);
-	return StringRef_rpartition_right(ref, delimiter);
+/// @brief Partitions a KilnString into two parts based on the first occurrence of a delimiter
+/// @param string The StringRef to be partitioned
+/// @param delimiter The delimiter string to search for
+/// @param output_buffer Array of 2 StringRefs to store the results - first part before delimiter, second part after delimiter
+inline void KilnString_partition(const KilnString* string, const char* delimiter, StringRef output_buffer[2]) {
+    StringRef ref = {string->ptr, string->__length};
+    StringRef_partition(ref, delimiter, output_buffer);
+}
+
+/// @brief Partitions a KilnString into two parts based on the last occurrence of a delimiter
+/// @param string The StringRef to be partitioned
+/// @param delimiter The delimiter string to search for from the end
+/// @param output_buffer Array of 2 StringRefs to store the results - first part before last delimiter, second part after last delimiter
+inline void KilnString_rpartition(const KilnString* string, const char* delimiter, StringRef output_buffer[2]) {
+    StringRef ref = {string->ptr, string->__length};
+    StringRef_rpartition(ref, delimiter, output_buffer);
 }

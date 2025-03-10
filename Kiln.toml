@@ -2,6 +2,7 @@
 name = "kiln_string"
 version = "0.0.1"
 language = "c"
+build_type = ["Exe"]
 
 [build_options]
 compiler_path = "gcc"
