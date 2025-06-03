@@ -13,7 +13,7 @@ void run_test(const char* test_name, void (*test_func)(void)) {
 // Test KilnString_from_cstr
 void test_kiln_string_from_cstr() {
     const char* test_str = "Hello, Kiln!";
-    KilnString kstr = KilnString_from_cstr(test_str);
+    kiln_string_t kstr = KilnString_from_cstr(test_str);
     
     assert(kstr.ptr != NULL);
     assert(strcmp(kstr.ptr, test_str) == 0);
@@ -26,9 +26,9 @@ void test_kiln_string_from_cstr() {
 // Test KilnString_from_string_ref
 void test_kiln_string_from_string_ref() {
     const char* test_str = "Hello, from StringRef!";
-    StringRef sr = StringRef_from_cstr(test_str);
+    kstring_ref_t sr = StringRef_from_cstr(test_str);
     
-    KilnString kstr = KilnString_from_string_ref(sr);
+    kiln_string_t kstr = KilnString_from_string_ref(sr);
     
     assert(kstr.ptr != NULL);
     assert(strcmp(kstr.ptr, test_str) == 0);
@@ -41,9 +41,9 @@ void test_kiln_string_from_string_ref() {
 // Test StringRef_to_kiln_string (alias of KilnString_from_string_ref)
 void test_string_ref_to_kiln_string() {
     const char* test_str = "Convert me to KilnString!";
-    StringRef sr = StringRef_from_cstr(test_str);
+    kstring_ref_t sr = StringRef_from_cstr(test_str);
     
-    KilnString kstr = StringRef_to_kiln_string(sr);
+    kiln_string_t kstr = StringRef_to_kiln_string(sr);
     
     assert(kstr.ptr != NULL);
     assert(strcmp(kstr.ptr, test_str) == 0);
@@ -55,10 +55,10 @@ void test_string_ref_to_kiln_string() {
 
 // Test KilnString_as_stringref
 void test_kiln_string_as_stringref() {
-    const char* test_str = "Extract StringRef from me!";
-    KilnString kstr = KilnString_from_cstr(test_str);
+    const char* test_str = "Extract kstring_ref_t from me!";
+    kiln_string_t kstr = KilnString_from_cstr(test_str);
     
-    StringRef sr = KilnString_as_stringref(&kstr);
+    kstring_ref_t sr = KilnString_as_stringref(&kstr);
     
     assert(sr.ptr == kstr.ptr);
     assert(sr.__length == kstr.__length);
@@ -68,10 +68,10 @@ void test_kiln_string_as_stringref() {
 
 // Test StringRef_from_kiln_str (alias of KilnString_as_stringref)
 void test_string_ref_from_kiln_str() {
-    const char* test_str = "Get StringRef from KilnString!";
-    KilnString kstr = KilnString_from_cstr(test_str);
+    const char* test_str = "Get kstring_ref_t from KilnString!";
+    kiln_string_t kstr = KilnString_from_cstr(test_str);
     
-    StringRef sr = StringRef_from_kiln_str(&kstr);
+    kstring_ref_t sr = StringRef_from_kiln_str(&kstr);
     
     assert(sr.ptr == kstr.ptr);
     assert(sr.__length == kstr.__length);
@@ -83,7 +83,7 @@ void test_string_ref_from_kiln_str() {
 void test_string_ref_from_cstr() {
     const char* test_str = "Plain C string here!";
     
-    StringRef sr = StringRef_from_cstr(test_str);
+    kstring_ref_t sr = StringRef_from_cstr(test_str);
     
     assert(sr.ptr != NULL);
     assert(sr.ptr == test_str); // Should reference the same memory
@@ -93,7 +93,7 @@ void test_string_ref_from_cstr() {
 // Test KilnString_free
 void test_kiln_string_free() {
     const char* test_str = "Free this string!";
-    KilnString kstr = KilnString_from_cstr(test_str);
+    kiln_string_t kstr = KilnString_from_cstr(test_str);
     
     KilnString_free(&kstr);    
     assert(kstr.ptr == NULL);
@@ -104,15 +104,15 @@ void test_kiln_string_free() {
 // Test with empty string
 void test_empty_string() {
     // Empty C string
-    KilnString kstr1 = KilnString_from_cstr("");
+    kiln_string_t kstr1 = KilnString_from_cstr("");
     assert(kstr1.ptr != NULL);
     assert(kstr1.ptr[0] == '\0');
     assert(kstr1.__length == 0);
     assert(kstr1.__capacity >= 0);
     
     // Empty StringRef
-    StringRef sr = StringRef_from_cstr("");
-    KilnString kstr2 = KilnString_from_string_ref(sr);
+    kstring_ref_t sr = StringRef_from_cstr("");
+    kiln_string_t kstr2 = KilnString_from_string_ref(sr);
     assert(kstr2.ptr != NULL);
     assert(kstr2.ptr[0] == '\0');
     assert(kstr2.__length == 0);
@@ -126,17 +126,17 @@ void test_empty_string() {
 void test_combined_operations() {
     const char* test_str = "Test string for combined operations";
     
-    // Create a KilnString from a C string
-    KilnString kstr = KilnString_from_cstr(test_str);
+    // Create a kiln_string_t from a C string
+    kiln_string_t kstr = KilnString_from_cstr(test_str);
     
     // Convert it to a StringRef
-    StringRef sr1 = KilnString_as_stringref(&kstr);
+    kstring_ref_t sr1 = KilnString_as_stringref(&kstr);
     
-    // Convert StringRef back to KilnString
-    KilnString kstr2 = StringRef_to_kiln_string(sr1);
+    // Convert kstring_ref_t back to KilnString
+    kiln_string_t kstr2 = StringRef_to_kiln_string(sr1);
     
-    // Create another StringRef from the second KilnString
-    StringRef sr2 = StringRef_from_kiln_str(&kstr2);
+    // Create another kstring_ref_t from the second KilnString
+    kstring_ref_t sr2 = StringRef_from_kiln_str(&kstr2);
     
     // Verify all the conversions maintained the string content
     assert(strcmp(kstr.ptr, test_str) == 0);
@@ -150,7 +150,7 @@ void test_combined_operations() {
 }
 
 int main() {
-    printf("=== KilnString Instantiation/Conversion Tests ===\n");
+    printf("=== kiln_string_t Instantiation/Conversion Tests ===\n");
     
     // Run all tests
     run_test("KilnString_from_cstr", test_kiln_string_from_cstr);
