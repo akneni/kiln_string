@@ -23,12 +23,12 @@ void test_kiln_string_from_cstr() {
     kiln_string_free(&kstr);
 }
 
-// Test kiln_string_from_string_ref
-void test_kiln_string_from_string_ref() {
+// Test kiln_string_from_kstring_ref
+void test_kiln_string_from_kstring_ref() {
     const char* test_str = "Hello, from StringRef!";
     kstring_ref_t sr = kstring_ref_from_cstr(test_str);
     
-    kiln_string_t kstr = kiln_string_from_string_ref(sr);
+    kiln_string_t kstr = kiln_string_from_kstring_ref(sr);
     
     assert(kstr.ptr != NULL);
     assert(strcmp(kstr.ptr, test_str) == 0);
@@ -38,7 +38,7 @@ void test_kiln_string_from_string_ref() {
     kiln_string_free(&kstr);
 }
 
-// Test kstring_ref_to_kiln_string (alias of kiln_string_from_string_ref)
+// Test kstring_ref_to_kiln_string (alias of kiln_string_from_kstring_ref)
 void test_string_ref_to_kiln_string() {
     const char* test_str = "Convert me to KilnString!";
     kstring_ref_t sr = kstring_ref_from_cstr(test_str);
@@ -53,12 +53,12 @@ void test_string_ref_to_kiln_string() {
     kiln_string_free(&kstr);
 }
 
-// Test kiln_string_as_stringref
-void test_kiln_string_as_stringref() {
+// Test kiln_string_to_kstring_ref
+void test_kiln_string_to_kstring_ref() {
     const char* test_str = "Extract kstring_ref_t from me!";
     kiln_string_t kstr = kiln_string_from_cstr(test_str);
     
-    kstring_ref_t sr = kiln_string_as_stringref(&kstr);
+    kstring_ref_t sr = kiln_string_to_kstring_ref(&kstr);
     
     assert(sr.ptr == kstr.ptr);
     assert(sr.__length == kstr.__length);
@@ -66,12 +66,12 @@ void test_kiln_string_as_stringref() {
     kiln_string_free(&kstr);
 }
 
-// Test kstring_ref_from_kiln_str (alias of kiln_string_as_stringref)
+// Test kstring_ref_from_kiln_string (alias of kiln_string_to_kstring_ref)
 void test_string_ref_from_kiln_str() {
     const char* test_str = "Get kstring_ref_t from KilnString!";
     kiln_string_t kstr = kiln_string_from_cstr(test_str);
     
-    kstring_ref_t sr = kstring_ref_from_kiln_str(&kstr);
+    kstring_ref_t sr = kstring_ref_from_kiln_string(&kstr);
     
     assert(sr.ptr == kstr.ptr);
     assert(sr.__length == kstr.__length);
@@ -112,7 +112,7 @@ void test_empty_string() {
     
     // Empty StringRef
     kstring_ref_t sr = kstring_ref_from_cstr("");
-    kiln_string_t kstr2 = kiln_string_from_string_ref(sr);
+    kiln_string_t kstr2 = kiln_string_from_kstring_ref(sr);
     assert(kstr2.ptr != NULL);
     assert(kstr2.ptr[0] == '\0');
     assert(kstr2.__length == 0);
@@ -130,13 +130,13 @@ void test_combined_operations() {
     kiln_string_t kstr = kiln_string_from_cstr(test_str);
     
     // Convert it to a StringRef
-    kstring_ref_t sr1 = kiln_string_as_stringref(&kstr);
+    kstring_ref_t sr1 = kiln_string_to_kstring_ref(&kstr);
     
     // Convert kstring_ref_t back to KilnString
     kiln_string_t kstr2 = kstring_ref_to_kiln_string(sr1);
     
     // Create another kstring_ref_t from the second KilnString
-    kstring_ref_t sr2 = kstring_ref_from_kiln_str(&kstr2);
+    kstring_ref_t sr2 = kstring_ref_from_kiln_string(&kstr2);
     
     // Verify all the conversions maintained the string content
     assert(strcmp(kstr.ptr, test_str) == 0);
@@ -154,10 +154,10 @@ int main() {
     
     // Run all tests
     run_test("kiln_string_from_cstr", test_kiln_string_from_cstr);
-    run_test("kiln_string_from_string_ref", test_kiln_string_from_string_ref);
+    run_test("kiln_string_from_kstring_ref", test_kiln_string_from_kstring_ref);
     run_test("kstring_ref_to_kiln_string", test_string_ref_to_kiln_string);
-    run_test("kiln_string_as_stringref", test_kiln_string_as_stringref);
-    run_test("kstring_ref_from_kiln_str", test_string_ref_from_kiln_str);
+    run_test("kiln_string_to_kstring_ref", test_kiln_string_to_kstring_ref);
+    run_test("kstring_ref_from_kiln_string", test_string_ref_from_kiln_str);
     run_test("kstring_ref_from_cstr", test_string_ref_from_cstr);
     run_test("kiln_string_free", test_kiln_string_free);
     run_test("Empty string handling", test_empty_string);

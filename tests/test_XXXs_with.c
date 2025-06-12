@@ -151,7 +151,7 @@ void test_special_chars() {
 void test_case_sensitivity() {
     // Create test string
     kiln_string_t kstr = kiln_string_from_cstr("CamelCaseString");
-    kstring_ref_t sr = kiln_string_as_stringref(&kstr);
+    kstring_ref_t sr = kiln_string_to_kstring_ref(&kstr);
     
     // Test case sensitivity
     assert(kiln_string_starts_with(&kstr, "Camel") == true);

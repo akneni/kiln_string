@@ -3,9 +3,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <ctype.h>
+#include <stddef.h>
 
 #include "../include/kiln_string.h"
-
 
 /// @brief Copies the data from string to it's own internal buffer
 /// @param string 
@@ -28,7 +28,7 @@ kiln_string_t kiln_string_from_cstr(const char* string) {
 /// @brief Creates a string from a kstring_ref_t by compying the contents. 
 /// @param str_ref 
 /// @return 
-inline kiln_string_t kiln_string_from_string_ref(kstring_ref_t str_ref) {
+inline kiln_string_t kiln_string_from_kstring_ref(kstring_ref_t str_ref) {
 	kiln_string_t str = {
 		.__length = str_ref.__length,
 		.__capacity = (str_ref.__length + 1)
@@ -41,29 +41,40 @@ inline kiln_string_t kiln_string_from_string_ref(kstring_ref_t str_ref) {
 	return str;
 }
 
+/// @brief Creates a string with capacity `capacity`
+/// @param capacity 
+/// @return 
+kiln_string_t kiln_string_with_capacity(size_t capacity) {
+    return (kiln_string_t) {
+        .ptr = malloc(capacity),
+        .__length = 0,
+        .__capacity = capacity,
+    };
+}
+
 /// @brief Creates a string from a kstring_ref_t by compying the contents. 
 /// @param str_ref 
 /// @return 
 inline kiln_string_t kstring_ref_to_kiln_string(kstring_ref_t str_ref) {
-	return kiln_string_from_string_ref(str_ref);
+	return kiln_string_from_kstring_ref(str_ref);
 }
 
-inline kstring_ref_t kiln_string_as_stringref(const kiln_string_t* string) {
+inline kstring_ref_t kiln_string_to_kstring_ref(const kiln_string_t* string) {
 	kstring_ref_t ref;
 	ref.__length = string->__length;
 	ref.ptr = string->ptr;
 	return ref;
 }
 
-inline kstring_ref_t kstring_ref_from_kiln_str(const kiln_string_t* string) {
-	return kiln_string_as_stringref(string);
+inline kstring_ref_t kstring_ref_from_kiln_string(const kiln_string_t* string) {
+	return kiln_string_to_kstring_ref(string);
 }
 
-inline kstring_ref_t kstring_ref_from_cstr(const char* string) {
-	kstring_ref_t ref;
-	ref.__length = strlen(string);
-	ref.ptr = string;
-	return ref;
+inline kstring_ref_t kstring_ref_from_cstr(char* string) {
+    return (kstring_ref_t) {
+        .__length = strlen(string),
+        .ptr = string,
+    };
 }
 
 /// @brief Frees the memory allocated by the kiln string. Sets the pointer to NULL
@@ -77,21 +88,21 @@ inline void kiln_string_free(kiln_string_t* str) {
 /// @brief Appends the content of a char* to a KilnString
 /// @param string 
 /// @param cstr 
-inline void kiln_string_push_cstr(kiln_string_t* string, const char* cstr) {
+inline void kiln_string_push_cstr(kiln_string_t* string, char* cstr) {
 	uint64_t length = strlen(cstr);
 	kstring_ref_t str_ref = {
 		.__length = length,
 		.ptr = cstr
 	};
 
-	kiln_string_push_stringref(string, str_ref);
+	kiln_string_push_kstring_ref(string, str_ref);
 }
 
 
 /// @brief Appends the content of a kstring_ref_t to a KilnString
 /// @param string The kiln_string_t to append to
 /// @param str_ref The kstring_ref_t to append
-void kiln_string_push_stringref(kiln_string_t* string, kstring_ref_t str_ref) {
+void kiln_string_push_kstring_ref(kiln_string_t* string, kstring_ref_t str_ref) {
     uint64_t new_length = string->__length + str_ref.__length;
     
     if (new_length + 1 > string->__capacity) {
@@ -168,6 +179,49 @@ bool kstring_ref_starts_with(kstring_ref_t string, const char* prefix) {
     return memcmp(string.ptr, prefix, prefix_len) == 0;
 }
 
+/// @brief Removes the specified suffix from the string if it has the suffix, does nothing if otherwise
+/// @param string 
+/// @param suffix 
+/// @return true if the suffix was found and removed, false if the suffix wasn't found
+bool kiln_string_remove_suffix(kiln_string_t* string, kstring_ref_t suffix) {
+    if (string->__length < suffix.__length) return false;
+
+    uint64_t length_after = string->__length - suffix.__length;
+    kstring_ref_t ref = {
+        .__length = suffix.__length,
+        .ptr = &string->ptr[length_after]
+    };
+
+    if (kstring_ref_equals(ref, suffix)) {
+        string->__length = length_after;
+        return true;
+    }
+
+    return false;
+}
+
+/// @brief Removes the specified prefix from the string if it has the prefix, does nothing if otherwise
+/// @param string 
+/// @param prefix 
+/// @return true if the prefix was found and removed, false if the prefix wasn't found
+bool kiln_string_remove_prefix(kiln_string_t* string, kstring_ref_t prefix) {
+    if (string->__length < prefix.__length) return false;
+
+    uint64_t length_after = string->__length - prefix.__length;
+    kstring_ref_t ref = {
+        .__length = prefix.__length,
+        .ptr = string->ptr
+    };
+
+    if (kstring_ref_equals(ref, prefix)) {
+        memmove(string->ptr, &string->ptr[prefix.__length], length_after);
+        string->__length = length_after;
+        return true;
+    }
+
+    return false;
+}
+
 /// @brief Gets a substring from the string passed
 /// @param string The source kstring_ref_t to extract substring from
 /// @param start_idx -1 to default to the start (or 0)
@@ -218,6 +272,20 @@ inline bool kstring_ref_equals_cstr(kstring_ref_t string, const char* other) {
     return memcmp(string.ptr, other, string.__length) == 0;
 }
 
+/// @brief Checks if a kstring_ref_t equals kiln_string_t
+/// @param string The kstring_ref_t to compare
+/// @param other The kiln string to compare against
+/// @return true if the strings are equal, false otherwise
+inline bool kstring_ref_equals_kiln_string(kstring_ref_t string, const kiln_string_t* other) {
+    kstring_ref_t ref = kiln_string_to_kstring_ref(other);
+    
+    if (string.__length != ref.__length) {
+        return false;
+    }
+    
+    return memcmp(string.ptr, other, string.__length) == 0;
+}
+
 /// @brief Checks if two StringRefs are equal
 /// @param s1 The first kstring_ref_t to compare
 /// @param s2 The second kstring_ref_t to compare
@@ -236,6 +304,11 @@ inline bool kstring_ref_equals(kstring_ref_t s1, kstring_ref_t s2) {
 inline bool kiln_string_equals_cstr(const kiln_string_t* string, const char* other) {
     kstring_ref_t ref = {string->ptr, string->__length};
     return kstring_ref_equals_cstr(ref, other);
+}
+
+inline bool kiln_string_equals_kstring_ref(const kiln_string_t* string, kstring_ref_t other) {
+    kstring_ref_t ref = {string->ptr, string->__length};
+    return kstring_ref_equals(ref, other);
 }
 
 /// @brief Checks if two KilnStrings are equalg
@@ -484,7 +557,7 @@ kstring_ref_t kiln_string_trim(const kiln_string_t* string) {
 /// @param string 
 /// @param old_s
 /// @param new_s
-void kiln_string_replace(kiln_string_t* string, const char* old_s, const char* new_s) {   
+void kiln_string_replace(kiln_string_t* string, const char* old_s, const char* new_s) {
 	const size_t old_len = strlen(old_s);
 	if (old_len == 0) {
 		return;
