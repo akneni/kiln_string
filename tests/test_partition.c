@@ -23,68 +23,68 @@ bool stringref_equals_cstr(kstring_ref_t ref, const char* expected) {
     return strncmp(ref.ptr, expected, ref.__length) == 0;
 }
 
-// Test StringRef_partition
+// Test kstring_ref_partition
 void test_stringref_partition() {
     // Test with delimiter in the middle
-    kstring_ref_t test1 = StringRef_from_cstr("Hello,World");
+    kstring_ref_t test1 = kstring_ref_from_cstr("Hello,World");
     kstring_ref_t result1[2];
-    StringRef_partition(test1, ",", result1);
+    kstring_ref_partition(test1, ",", result1);
     
     assert(stringref_equals_cstr(result1[0], "Hello"));
     assert(stringref_equals_cstr(result1[1], "World"));
     
     // Test with delimiter at the beginning
-    kstring_ref_t test2 = StringRef_from_cstr(",Hello World");
+    kstring_ref_t test2 = kstring_ref_from_cstr(",Hello World");
     kstring_ref_t result2[2];
-    StringRef_partition(test2, ",", result2);
+    kstring_ref_partition(test2, ",", result2);
     
     assert(stringref_equals_cstr(result2[0], ""));
     assert(stringref_equals_cstr(result2[1], "Hello World"));
     
     // Test with delimiter at the end
-    kstring_ref_t test3 = StringRef_from_cstr("Hello World,");
+    kstring_ref_t test3 = kstring_ref_from_cstr("Hello World,");
     kstring_ref_t result3[2];
-    StringRef_partition(test3, ",", result3);
+    kstring_ref_partition(test3, ",", result3);
     
     assert(stringref_equals_cstr(result3[0], "Hello World"));
     assert(stringref_equals_cstr(result3[1], ""));
     
     // Test with delimiter not found
-    kstring_ref_t test4 = StringRef_from_cstr("Hello World");
+    kstring_ref_t test4 = kstring_ref_from_cstr("Hello World");
     kstring_ref_t result4[2];
-    StringRef_partition(test4, ",", result4);
+    kstring_ref_partition(test4, ",", result4);
     
     assert(stringref_equals_cstr(result4[0], "Hello World"));
     assert(stringref_equals_cstr(result4[1], ""));
     
     // Test with multiple delimiters (should only split on first occurrence)
-    kstring_ref_t test5 = StringRef_from_cstr("one,two,three");
+    kstring_ref_t test5 = kstring_ref_from_cstr("one,two,three");
     kstring_ref_t result5[2];
-    StringRef_partition(test5, ",", result5);
+    kstring_ref_partition(test5, ",", result5);
     
     assert(stringref_equals_cstr(result5[0], "one"));
     assert(stringref_equals_cstr(result5[1], "two,three"));
     
     // Test with multi-character delimiter
-    kstring_ref_t test6 = StringRef_from_cstr("part1::part2");
+    kstring_ref_t test6 = kstring_ref_from_cstr("part1::part2");
     kstring_ref_t result6[2];
-    StringRef_partition(test6, "::", result6);
+    kstring_ref_partition(test6, "::", result6);
     
     assert(stringref_equals_cstr(result6[0], "part1"));
     assert(stringref_equals_cstr(result6[1], "part2"));
     
     // Test with empty string
-    kstring_ref_t test7 = StringRef_from_cstr("");
+    kstring_ref_t test7 = kstring_ref_from_cstr("");
     kstring_ref_t result7[2];
-    StringRef_partition(test7, ",", result7);
+    kstring_ref_partition(test7, ",", result7);
     
     assert(stringref_equals_cstr(result7[0], ""));
     assert(stringref_equals_cstr(result7[1], ""));
     
     // Test with empty delimiter (implementation-dependent, may not be valid)
-    kstring_ref_t test8 = StringRef_from_cstr("Hello World");
+    kstring_ref_t test8 = kstring_ref_from_cstr("Hello World");
     kstring_ref_t result8[2];
-    StringRef_partition(test8, "", result8);
+    kstring_ref_partition(test8, "", result8);
     
     // Since an empty delimiter might have special behavior, the assertion depends on implementation
     // Typical behavior would be to split at beginning, but this is implementation-dependent
@@ -96,68 +96,68 @@ void test_stringref_partition() {
     }
 }
 
-// Test StringRef_rpartition
+// Test kstring_ref_rpartition
 void test_stringref_rpartition() {
     // Test with delimiter in the middle
-    kstring_ref_t test1 = StringRef_from_cstr("Hello,World");
+    kstring_ref_t test1 = kstring_ref_from_cstr("Hello,World");
     kstring_ref_t result1[2];
-    StringRef_rpartition(test1, ",", result1);
+    kstring_ref_rpartition(test1, ",", result1);
     
     assert(stringref_equals_cstr(result1[0], "Hello"));
     assert(stringref_equals_cstr(result1[1], "World"));
     
     // Test with delimiter at the beginning
-    kstring_ref_t test2 = StringRef_from_cstr(",Hello World");
+    kstring_ref_t test2 = kstring_ref_from_cstr(",Hello World");
     kstring_ref_t result2[2];
-    StringRef_rpartition(test2, ",", result2);
+    kstring_ref_rpartition(test2, ",", result2);
     
     assert(stringref_equals_cstr(result2[0], ""));
     assert(stringref_equals_cstr(result2[1], "Hello World"));
     
     // Test with delimiter at the end
-    kstring_ref_t test3 = StringRef_from_cstr("Hello World,");
+    kstring_ref_t test3 = kstring_ref_from_cstr("Hello World,");
     kstring_ref_t result3[2];
-    StringRef_rpartition(test3, ",", result3);
+    kstring_ref_rpartition(test3, ",", result3);
     
     assert(stringref_equals_cstr(result3[0], "Hello World"));
     assert(stringref_equals_cstr(result3[1], ""));
     
     // Test with delimiter not found
-    kstring_ref_t test4 = StringRef_from_cstr("Hello World");
+    kstring_ref_t test4 = kstring_ref_from_cstr("Hello World");
     kstring_ref_t result4[2];
-    StringRef_rpartition(test4, ",", result4);
+    kstring_ref_rpartition(test4, ",", result4);
     
     assert(stringref_equals_cstr(result4[0], "Hello World"));
     assert(stringref_equals_cstr(result4[1], ""));
     
     // Test with multiple delimiters (should only split on last occurrence)
-    kstring_ref_t test5 = StringRef_from_cstr("one,two,three");
+    kstring_ref_t test5 = kstring_ref_from_cstr("one,two,three");
     kstring_ref_t result5[2];
-    StringRef_rpartition(test5, ",", result5);
+    kstring_ref_rpartition(test5, ",", result5);
     
     assert(stringref_equals_cstr(result5[0], "one,two"));
     assert(stringref_equals_cstr(result5[1], "three"));
     
     // Test with multi-character delimiter
-    kstring_ref_t test6 = StringRef_from_cstr("part1::part2::part3");
+    kstring_ref_t test6 = kstring_ref_from_cstr("part1::part2::part3");
     kstring_ref_t result6[2];
-    StringRef_rpartition(test6, "::", result6);
+    kstring_ref_rpartition(test6, "::", result6);
     
     assert(stringref_equals_cstr(result6[0], "part1::part2"));
     assert(stringref_equals_cstr(result6[1], "part3"));
     
     // Test with empty string
-    kstring_ref_t test7 = StringRef_from_cstr("");
+    kstring_ref_t test7 = kstring_ref_from_cstr("");
     kstring_ref_t result7[2];
-    StringRef_rpartition(test7, ",", result7);
+    kstring_ref_rpartition(test7, ",", result7);
     
     assert(stringref_equals_cstr(result7[0], ""));
     assert(stringref_equals_cstr(result7[1], ""));
     
     // Test with empty delimiter (implementation-dependent, may not be valid)
-    kstring_ref_t test8 = StringRef_from_cstr("Hello World");
+    kstring_ref_t test8 = kstring_ref_from_cstr("Hello World");
     kstring_ref_t result8[2];
-    StringRef_rpartition(test8, "", result8);
+    kstring_ref_rpartition(test8, "", result8);
     
     // Since an empty delimiter might have special behavior, the assertion depends on implementation
     // Typical behavior would be to split at end, but this is implementation-dependent
@@ -171,18 +171,18 @@ void test_stringref_rpartition() {
 // Test case comparing partition and rpartition with multiple delimiters
 void test_compare_partition_methods() {
     // String with multiple delimiters for comparison
-    kstring_ref_t test = StringRef_from_cstr("first,second,third,fourth");
+    kstring_ref_t test = kstring_ref_from_cstr("first,second,third,fourth");
     
     // Forward partition (splits on first delimiter)
     kstring_ref_t forward_result[2];
-    StringRef_partition(test, ",", forward_result);
+    kstring_ref_partition(test, ",", forward_result);
     
     assert(stringref_equals_cstr(forward_result[0], "first"));
     assert(stringref_equals_cstr(forward_result[1], "second,third,fourth"));
     
     // Reverse partition (splits on last delimiter)
     kstring_ref_t reverse_result[2];
-    StringRef_rpartition(test, ",", reverse_result);
+    kstring_ref_rpartition(test, ",", reverse_result);
     
     assert(stringref_equals_cstr(reverse_result[0], "first,second,third"));
     assert(stringref_equals_cstr(reverse_result[1], "fourth"));
@@ -198,33 +198,33 @@ void test_partition_edge_cases() {
     memset(long_str, 'a', 1023);
     long_str[1023] = '\0';
     
-    kstring_ref_t long_ref = StringRef_from_cstr(long_str);
+    kstring_ref_t long_ref = kstring_ref_from_cstr(long_str);
     kstring_ref_t result[2];
     
     // Place delimiter at beginning
     long_str[0] = ',';
-    StringRef_partition(long_ref, ",", result);
+    kstring_ref_partition(long_ref, ",", result);
     assert(result[0].__length == 0);
     assert(result[1].__length == 1022);
     
     // Place delimiter at end
     long_str[0] = 'a';
     long_str[1022] = ',';
-    long_ref = StringRef_from_cstr(long_str);
-    StringRef_partition(long_ref, ",", result);
+    long_ref = kstring_ref_from_cstr(long_str);
+    kstring_ref_partition(long_ref, ",", result);
     assert(result[0].__length == 1022);
     assert(result[1].__length == 0);
     
     // Test with repeated delimiters
-    kstring_ref_t repeats = StringRef_from_cstr(",,,,test,,,,");
+    kstring_ref_t repeats = kstring_ref_from_cstr(",,,,test,,,,");
     
     // Forward partition should find first delimiter
-    StringRef_partition(repeats, ",", result);
+    kstring_ref_partition(repeats, ",", result);
     assert(result[0].__length == 0);
     assert(stringref_equals_cstr(result[1], ",,,test,,,,"));
     
     // Reverse partition should find last delimiter
-    StringRef_rpartition(repeats, ",", result);
+    kstring_ref_rpartition(repeats, ",", result);
     assert(stringref_equals_cstr(result[0], ",,,,test,,,"));
     assert(result[1].__length == 0);
 }
@@ -233,8 +233,8 @@ int main() {
     printf("=== kiln_string_t Partition Tests ===\n");
     
     // Run all tests
-    run_test("StringRef_partition", test_stringref_partition);
-    run_test("StringRef_rpartition", test_stringref_rpartition);
+    run_test("kstring_ref_partition", test_stringref_partition);
+    run_test("kstring_ref_rpartition", test_stringref_rpartition);
     run_test("Compare partition methods", test_compare_partition_methods);
     run_test("Partition edge cases", test_partition_edge_cases);
     
