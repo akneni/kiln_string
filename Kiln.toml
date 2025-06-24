@@ -1,10 +1,14 @@
 [project]
 name = "kiln_string"
-version = "0.0.1"
+version = "0.0.2"
 language = "c"
-build_type = ["Exe"]
+build_type = ["ingot"]
+src_dirs = ["src"]
+include_dirs = ["include"]
+
 
 [build_options]
 compiler_path = "gcc"
-debug_flags = ["-g", "-O0", "-Wall", "-fsanitize=undefined"]
-release_flags = ["-Wall", "-O3"]
+debug_flags = ["-g", "-O0", "-fsanitize=undefined"]
+release_flags = ["-O3"]
+shared_flags = ["-Wall"]
