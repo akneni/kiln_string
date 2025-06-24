@@ -1,6 +1,6 @@
 [project]
 name = "kiln_string"
-version = "0.0.3"
+version = "0.1.1"
 language = "c"
 build_type = ["ingot"]
 src_dirs = ["src"]
